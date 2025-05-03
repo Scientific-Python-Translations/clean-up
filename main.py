@@ -1,14 +1,9 @@
-import yaml
 import os
 import traceback
-import tempfile
-import shutil
 
-from datetime import datetime
 from subprocess import Popen, PIPE
 from pathlib import Path
 from typing import Optional, Union
-from crowdin_api import CrowdinClient  # type: ignore
 from github import Github, Auth
 from dotenv import load_dotenv
 
@@ -145,12 +140,17 @@ def clean_up_branches(
     g = Github(auth=auth)
     branches = g.get_repo(translations_repo).get_branches()
     branch_names = [branch.name for branch in branches]
-    branch_names.remove("main")    
+    branch_names.remove("main")
     for branch in branch_names:
-        if branch.startswith(("content-sync-", "l10n_main", "add/translators-file", "add/status-file")):
+        if branch.startswith(
+            ("content-sync-", "l10n_main", "add/translators-file", "add/status-file")
+        ):
             print(f"### Deleting branch {branch}")
             run(["git", "branch", "-d", branch], cwd=base_translations_path)
-            run(["git", "push", "origin", "--delete", branch], cwd=base_translations_path)
+            run(
+                ["git", "push", "origin", "--delete", branch],
+                cwd=base_translations_path,
+            )
 
 
 def main() -> None:
