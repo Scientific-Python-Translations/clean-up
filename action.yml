@@ -22,7 +22,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
       with:
-        repository: "Scientific-Python-Translations/translations-sync"
+        repository: "Scientific-Python-Translations/clean-up"
     - name: Import GPG key
       id: import-gpg
       uses: crazy-max/ghaction-import-gpg@v6
