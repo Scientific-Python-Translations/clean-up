@@ -16,7 +16,6 @@ def parse_input() -> dict:
         "username": "Scientific-Python-Translations",
         # Provided by organization secrets
         "token": os.environ["TOKEN"],
-        "crowdin_token": os.environ["CROWDIN_TOKEN"],
         # Provided by user action input
         "translations_repo": os.environ["INPUT_TRANSLATIONS-REPO"],
         "translations_ref": os.environ["INPUT_TRANSLATIONS-REF"],
