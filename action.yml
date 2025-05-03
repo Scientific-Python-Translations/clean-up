@@ -1,0 +1,108 @@
+name: "Create Language Translation PR"
+description: "Create a translation PR for a Scientific Python Project"
+author: "@goanpeca"
+inputs:
+  source-repo:
+    description: "Source repository"
+    required: true
+  source-path:
+    description: "Source folder"
+    required: true
+  source-ref:
+    description: "Source reference"
+    default: "main"
+  translations-repo:
+    description: "Translations repository"
+    required: true
+  translations-path:
+    description: "This is the folder in the translations repo where all the content will be copied to."
+    required: true
+  translations-source-path:
+    description: "This is the folder in the translations repo where all the content will be copied to."
+    required: true
+  translations-ref:
+    description: "Translations reference"
+    default: "main"
+  translation-percentage:
+    description: "Minimum value of language translation to create a PR e.g. '98'"
+    required: true
+  approval-percentage:
+    description: "Minimum value of language approval to create a PR e.g. '95'"
+    required: true
+  use-precommit:
+    description: "Apply pre-commit before submitting the final PR upstream. Default is 'false'."
+    default: "false"
+  create-toml-file:
+    description: "Create toml file with translators information."
+    default: "false"
+  create-upstream-pr:
+    description: ""
+    default: "false"
+  auto-merge:
+    description: ""
+    default: "false"
+  gpg-private-key:
+    description: "GPG private key of the user/email making the commits"
+    required: true
+  passphrase:
+    description: "GPG passphrase of the user/email making the commits"
+    required: true
+  token:
+    description: "Github personal access token of the account performing the github operations"
+    required: true
+  crowdin-token:
+    description: "Crowdin personal access token of the account performing the github operations"
+    required: true
+  crowdin-project:
+    description: "Name of the associated crowdin project. This is used to fetch the latest translators from crowdin. This is case sensitive."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "Scientific-Python-Translations/translations-sync"
+    - name: Import GPG key
+      id: import-gpg
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ inputs.GPG-PRIVATE-KEY }}
+        passphrase: ${{ inputs.PASSPHRASE }}
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+        git_config_global: true
+    - name: Configure commit signing
+      shell: bash
+      run: |
+        git config --global user.name "${{ steps.import-gpg.outputs.name }}"
+        git config --global user.email "${{ steps.import-gpg.outputs.email }}"
+    - name: Configure python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12" # '3.x'
+    - name: Run scripts
+      shell: bash
+      env:
+        INPUT_SOURCE-REPO: ${{ inputs.SOURCE-REPO }}
+        INPUT_SOURCE-PATH: ${{ inputs.SOURCE-PATH }}
+        INPUT_SOURCE-REF: ${{ inputs.SOURCE-REF }}
+        INPUT_TRANSLATIONS-REPO: ${{ inputs.TRANSLATIONS-REPO }}
+        INPUT_TRANSLATIONS-PATH: ${{ inputs.TRANSLATIONS-PATH }}
+        INPUT_TRANSLATIONS-SOURCE-PATH: ${{ inputs.TRANSLATIONS-SOURCE-PATH }}
+        INPUT_TRANSLATIONS-REF: ${{ inputs.TRANSLATIONS-REF }}
+        INPUT_CROWDIN-PROJECT: ${{ inputs.CROWDIN-PROJECT }}
+        INPUT_APPROVAL-PERCENTAGE: ${{ inputs.APPROVAL-PERCENTAGE }}
+        INPUT_TRANSLATION-PERCENTAGE: ${{ inputs.TRANSLATION-PERCENTAGE }}
+        INPUT_USE-PRECOMMIT: ${{ inputs.USE-PRECOMMIT }}
+        INPUT_CREATE-TOML-FILE: ${{ inputs.CREATE-TOML-FILE }}
+        INPUT_CREATE-UPSTREAM-PR: ${{ inputs.CREATE-UPSTREAM-PR }}
+        INPUT_AUTO-MERGE: ${{ inputs.AUTO-MERGE }}
+        GPG_NAME: ${{ steps.import-gpg.outputs.name }}
+        GPG_EMAIL: ${{ steps.import-gpg.outputs.email }}
+        TOKEN: ${{ inputs.TOKEN }}
+        CROWDIN_TOKEN: ${{ inputs.CROWDIN-TOKEN }}
+        CROWDIN_PROJECT: ${{ inputs.CROWDIN-PROJECT }}
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install crowdin-api-client python-dotenv pre-commit pygithub requests
+        python main.py
