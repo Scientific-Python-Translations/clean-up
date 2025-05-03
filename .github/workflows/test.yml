@@ -15,21 +15,13 @@ jobs:
           pip install pre-commit
           pre-commit run --all-files
       - name: Test action
-        uses: Scientific-Python-Translations/translations-sync@main
+        uses: Scientific-Python-Translations/clean-up@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # Provided by user
-          crowdin-project: "NumPy.Org"
-          source-repo: "numpy/numpy.org"
-          source-folder: "numpy.org/content/en/"
-          source-ref: "main"
-          translations-repo: "Scientific-Python-Translations/numpy.org-translations"
-          translations-folder: "numpy.org-translations/content/en/"
+          translations-repo: "Scientific-Python-Translations/clean-up"
           translations-ref: "main"
-          translation-percentage: "90"
-          approval-percentage: "0"
-          use-precommit: "true"
           # Provided by organization secrets
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
