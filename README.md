@@ -16,7 +16,7 @@ name: Clean Up
 
 on:
   schedule:
-    - cron: "0 3 * * 0" # Runs every Sunday at 3 AM
+    - cron: '0 12 * * FRI'  # Every Fridat at midnight
   workflow_dispatch:
 
 jobs:
@@ -28,10 +28,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Provided by user
           translations-repo: "Scientific-Python-Translations/numpy.org-translations"
           translations-ref: "main"
-          # Provided by organization secrets
+          # These are provided by the Scientific Python Project and allow
+          # automation with bots
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           token: "not-a-real-token"
